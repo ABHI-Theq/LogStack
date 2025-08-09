@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prebuild": "eslint . --ext .js,.ts,.tsx",
+       "prebuild": "eslint . --ext .js,.ts,.tsx",
     "build": "tsc",
     "watch": "tsc -w",
     "prestart": "npm run build",
