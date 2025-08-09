@@ -30,7 +30,9 @@ export const createBlog = async (req: AuthenticatedRequest, res: Response) => {
     return res
       .status(201)
       .json({ message: "Blog created successfully", blog: result[0] });
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).json({error:error instanceof Error?error.message:"Error occured"})
+  }
 };
 
 export const updateBlog = async (req: AuthenticatedRequest, res: Response) => {
@@ -68,10 +70,10 @@ export const updateBlog = async (req: AuthenticatedRequest, res: Response) => {
 
     const updatedBlog = await sql`UPDATE blogs SET 
   title = ${title || blogs[0].title},
-  description = ${title || blogs[0].description},
+  description = ${description || blogs[0].description},
   image= ${imgUrl},
-  blogcontent = ${title || blogs[0].blogcontent},
-  category = ${title || blogs[0].category}
+  blogcontent = ${blogcontent || blogs[0].blogcontent},
+  category = ${category || blogs[0].category}
 
   WHERE id = ${id}
   RETURNING *
@@ -79,9 +81,11 @@ export const updateBlog = async (req: AuthenticatedRequest, res: Response) => {
 
     return res.status(200).json({
       message: "blog updated successfully",
-      updateBlog,
+      updatedBlog,
     });
-  } catch (error) {}
+  } catch (error) {
+        return res.status(500).json({error:error instanceof Error?error.message:"Error occured"})
+  }
 };
 
 export const deleteBlog = async (req: AuthenticatedRequest, res: Response) => {
@@ -110,6 +114,6 @@ export const deleteBlog = async (req: AuthenticatedRequest, res: Response) => {
 
     return res.status(200).json({message:"blog deleted",success:true})
   } catch (error) {
-
+    return res.status(500).json({error:error instanceof Error?error.message:"Error occured"})
   }
 };
