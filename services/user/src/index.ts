@@ -17,7 +17,7 @@ const app=express()
 app.use(express.json())
 app.use(urlencoded({extended:true}))
 app.use(cors())
-app.use("/api/auth",UserRoute)
+app.use("/api/v1",UserRoute)
 app.listen(process.env.PORT,()=>{
     console.log(`Server is running on http://localhost:${process.env.PORT}`);  
 })
