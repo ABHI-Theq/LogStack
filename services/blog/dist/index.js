@@ -36,24 +36,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.redis = void 0;
 const express_1 = __importStar(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const DBConnect_1 = __importDefault(require("./utils/DBConnect"));
-const user_route_1 = __importDefault(require("./routes/user.route"));
-const cloudinary_1 = require("cloudinary");
+const blog_routes_1 = __importDefault(require("./routes/blog.routes"));
+const redis_1 = require("@upstash/redis");
 dotenv_1.default.config();
-(0, DBConnect_1.default)();
-cloudinary_1.v2.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET
-});
 const app = (0, express_1.default)();
+exports.redis = new redis_1.Redis({
+    url: process.env.REDIS_URL,
+    token: process.env.REDIS_TOKEN
+});
 app.use(express_1.default.json());
 app.use((0, express_1.urlencoded)({ extended: true }));
-app.use((0, cors_1.default)());
-app.use("/api/v1", user_route_1.default);
+app.use("/api/v1", blog_routes_1.default);
 app.listen(process.env.PORT, () => {
-    console.log(`Server is running on http://localhost:${process.env.PORT}`);
+    console.log(`server is running on port ${process.env.PORT}`);
 });

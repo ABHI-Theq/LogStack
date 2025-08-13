@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import User from "../model/user";
 import jwt from "jsonwebtoken";
-import { File } from "buffer";
 import getBuffer from "../utils/datauri";
 import {v2 as cloudinary} from "cloudinary";
 
