@@ -2,9 +2,11 @@ import express, { urlencoded } from "express"
 import dotenv from "dotenv"
 import blogRoutes from "./routes/blog.routes"
 import {Redis} from "@upstash/redis"
+import { startConsumer } from "./utils/consumer"
 dotenv.config()
-
 const app=express()
+
+startConsumer()
 
 export const redis=new Redis({
     url:process.env.REDIS_URL,

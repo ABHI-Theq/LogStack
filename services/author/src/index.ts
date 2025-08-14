@@ -4,6 +4,7 @@ import { sql } from "./utils/DBConnect"
 import blogrouter from "./routes/blog.route"
 import {v2 as cloudinary} from "cloudinary"
 import { connectRabbitMQ } from "./utils/rabbitmq"
+import cors from "cors"
 dotenv.config()
 
 cloudinary.config({
@@ -58,6 +59,7 @@ async function initDB(){
 
 app.use(express.json())
 app.use(urlencoded({extended:true}))
+app.use(cors())
 
 app.use("/api/v1",blogrouter) 
 

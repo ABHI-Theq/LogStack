@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from "../middleware/isAuth";
 import getBuffer from "../utils/datauri";
 import { v2 as cloudinary } from "cloudinary";
 import { sql } from "../utils/DBConnect";
+import { invalidateCacheJob } from "../utils/rabbitmq";
 
 export const createBlog = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -10,7 +11,7 @@ export const createBlog = async (req: AuthenticatedRequest, res: Response) => {
 
     const file = req.file;
     if (!file) {
-      return res.status(400).json({ error: "file not foundt" });
+      return res.status(400).json({ error: "file not found" });
     }
     const fileBuffer = getBuffer(file);
     if (!fileBuffer) {
@@ -27,11 +28,15 @@ export const createBlog = async (req: AuthenticatedRequest, res: Response) => {
     INSERT INTO blogs (title,description,image,blogcontent,category,author) VALUES (${title},${description}
     ,${cloud.secure_url},${blogcontent},${category},${req.user?._id}) RETURNING *;`;
 
+    await invalidateCacheJob(["blogs:*"]);
+
     return res
       .status(201)
       .json({ message: "Blog created successfully", blog: result[0] });
   } catch (error) {
-    return res.status(500).json({error:error instanceof Error?error.message:"Error occured"})
+    return res.status(500).json({
+      error: error instanceof Error ? error.message : "Error occured",
+    });
   }
 };
 
@@ -79,12 +84,16 @@ export const updateBlog = async (req: AuthenticatedRequest, res: Response) => {
   RETURNING *
   `;
 
+    await invalidateCacheJob(["blogs:*", `blog:${id}`]);
+
     return res.status(200).json({
       message: "blog updated successfully",
       updatedBlog,
     });
   } catch (error) {
-        return res.status(500).json({error:error instanceof Error?error.message:"Error occured"})
+    return res.status(500).json({
+      error: error instanceof Error ? error.message : "Error occured",
+    });
   }
 };
 
@@ -110,10 +119,12 @@ export const deleteBlog = async (req: AuthenticatedRequest, res: Response) => {
     await sql`DELETE FROM comments WHERE blogid = ${req.params.id}`;
     await sql`DELETE FROM blogs WHERE id = ${req.params.id}`;
 
-    // await invalidateChacheJob(["blogs:*", `blog:${req.params.id}`]);
+    await invalidateCacheJob(["blogs:*", `blog:${req.params.id}`]);
 
-    return res.status(200).json({message:"blog deleted",success:true})
+    return res.status(200).json({ message: "blog deleted", success: true });
   } catch (error) {
-    return res.status(500).json({error:error instanceof Error?error.message:"Error occured"})
+    return res.status(500).json({
+      error: error instanceof Error ? error.message : "Error occured",
+    });
   }
 };
