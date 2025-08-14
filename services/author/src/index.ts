@@ -3,6 +3,7 @@ import dotenv from "dotenv"
 import { sql } from "./utils/DBConnect"
 import blogrouter from "./routes/blog.route"
 import {v2 as cloudinary} from "cloudinary"
+import { connectRabbitMQ } from "./utils/rabbitmq"
 dotenv.config()
 
 cloudinary.config({
@@ -11,6 +12,7 @@ cloudinary.config({
     api_secret:process.env.CLOUD_API_SECRET
 })
 
+connectRabbitMQ()
 
 
 const app=express()
